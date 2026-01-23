@@ -5,32 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Black Magic Probe",
-            "type": "cppdbg",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/PompeSAP.elf",
+            "name": "Launch BMP",
             "request": "launch",
-            "preLaunchTask": "build",
-            "cwd": "${workspaceRoot}",
-            "MIMode": "gdb",
-            "targetArchitecture": "arm",
-            "logging": {
-                "engineLogging": true
-            },
-            "program": "${workspaceRoot}/build/testeur.elf",
-            "miDebuggerPath": "arm-none-eabi-gdb",
-            "customLaunchSetupCommands": [
-                {"text": "cd ${workspaceRoot}/build"},
-                {"text": "target extended-remote /dev/bmp_gdb"},
-                {"text": "monitor swdp_scan"},
-                {"text": "attach 1"},
-                {"text": "file testeur.elf"},
-                {"text": "load"},
-                {"text": "cd ${workspaceRoot}"},
-                {"text": "set mem inaccessible-by-default off"},
-                {"text": "break main"}
-              ]
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "servertype": "bmp",
+            "BMPGDBSerialPort": "/dev/bmp_gdb",
+            "armToolchainPath": "/opt/arm-gnu-toolchain-14.2/bin/",
+            "gdbPath": "/opt/arm-gnu-toolchain-14.2/bin/arm-none-eabi-gdb",
+            "svdFile": "${workspaceFolder}/STM32L432.svd"
+        },
+                {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/PompeSAP.elf",
+            "name": "Attach BMP",
+            "request": "attach",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "servertype": "bmp",
+            "BMPGDBSerialPort": "/dev/bmp_gdb",
+            "armToolchainPath": "/opt/arm-gnu-toolchain-14.2/bin/",
+            "gdbPath": "/opt/arm-gnu-toolchain-14.2/bin/arm-none-eabi-gdb",
+            "svdFile": "${workspaceFolder}/STM32L432.svd"
         }
-
-
-
     ]
 }
