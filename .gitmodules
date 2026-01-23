@@ -4,3 +4,6 @@
 [submodule "chibios_enac_various_common"]
 	path = chibios_enac_various_common
 	url = https://github.com/alex31/chibios_enac_various_common.git
+[submodule "STM32_open_pin_data"]
+	path = STM32_open_pin_data
+	url = https://github.com/STMicroelectronics/STM32_open_pin_data.git

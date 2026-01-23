@@ -220,7 +220,7 @@ $(OBJS): $(CONFDIR)/board.h
 
 $(CONFDIR)/board.h: $(CONFDIR)/board.cfg
 	$(shell mkdir -p $(dir $@))
-	$(TOOLDIR)/boardGen.pl --no-pp-line $<  $@
+	$(TOOLDIR)/boardGen.pl -opd=STM32_open_pin_data --no-pp-line $<  $@
 
 flash: build/ch.elf
 	$(TOOLDIR)/bmpflash build/ch.elf
