@@ -1,34 +1,51 @@
 {
+    "version" : "2.0.0",
     "tasks": [
         {
-            "type": "shell",
-            "label": "build",
+            "label": "Build",
             "command": "make",
             "options": {
-                "cwd": "${workspaceRoot}"
+                "statusbar": {
+                    "label": "$(gear) Build"
+                }
             },
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
         },
         {
-            "type": "shell",
-            "label": "clean",
-            "command": "make clean",
-            "options": {
-                "cwd": "${workspaceRoot}"
+            "label": "Flash",
+            "command": "make",
+            "args" : [
+                "flash"
+            ],
+            "dependsOn" : [
+                "Build"
+            ],
+            "options":{
+                "statusbar" : {
+                 "label": "$(arrow-right) Flash"
+                },
             },
-            "problemMatcher": []
         },
-        {
-            "type": "shell",
-            "label": "flash_bmp",
-            "command": "make flash",
+        {   
+            "label" : "Clean",
+            "command":"make", 
+            "args": [
+                "-D","/dev/ttyACMbmp"
+            ],
             "options": {
-                "cwd": "${workspaceRoot}"
-            },
-            "problemMatcher": []
-        }
+                "statusbar": {
+                    "label": "Serial monitor $(plug)"
+                }
+            }
+        },
+
+
+
+            
+
+
+        
     ],
-    "version": "2.0.0"
 }
