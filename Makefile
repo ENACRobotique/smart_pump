@@ -149,6 +149,7 @@ LDSCRIPT= $(STARTUPLD)/STM32L432xC.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(VARIOUS)/usb_serial.c \
+       $(VARIOUS)/adcHelper.c \
        $(VARIOUS)/microrl/microrl.c \
        $(VARIOUS)/microrl/microrlShell.c \
        $(VARIOUS)/stdutil.c \

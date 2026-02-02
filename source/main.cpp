@@ -1,7 +1,6 @@
 #include <ch.h>
 #include <hal.h>
-#include <chprintf.h>
-#include <string.h>
+#include "adcHelper.h"
 
 #define LINE_PUMP   PAL_LINE(GPIOB, 0)
 #define LINE_VALVE  PAL_LINE(GPIOA, 7)
@@ -15,17 +14,12 @@
 
 static adcsample_t adc_buffer[ADC_BUFFER];
 
-static const ADCConversionGroup adc_convert = {
-  FALSE,
-  ADC_GRP1_NUM_CHANNELS,
-  NULL,
-  NULL,
-  0,
-  ADC_CR2_SWSTART,
-  0,
-  ADC_SMPR2_SMP_AN1,
-  ADC_SQR3_SQ1_N(ADC_CHANNEL_IN1)
-};
+static const ADCConversionGroup adcCfg = adcgetConfig (
+2, 
+LINE_CO1_POT1, 
+LINE_CO2_POT2,
+ADC_END 
+);
 
 
 static bool pump_enabled = false;
@@ -51,13 +45,13 @@ static inline void valve_fermer(void) {
 // init adc
 
 static uint16_t lecture_courant(void) {
-  adcConvert(&ADCD1, &adcgrpcfg, adc_buffer, ADC_BUFFER);
+  adcConvert(&ADC1, &adc_convert, adc_buffer, ADC_BUFFER);
 
   uint32_t sum = 0;
   for (uint8_t i = 0; i < ADC_BUFFER; i++) {
     sum += adc_buffer[i];
   }
-  return sum / ADC_BUFFER;s
+  return sum / ADC_BUFFER;
 }
 
 
@@ -135,7 +129,7 @@ static const ShellConfig shell_cfg = {
   commands
 };
 
-/* ================= MAIN ================= */
+
 
 int main(void) {
 
