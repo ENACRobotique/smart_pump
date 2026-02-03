@@ -148,8 +148,6 @@ LDSCRIPT= $(STARTUPLD)/STM32L432xC.ld
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CSRC = $(ALLCSRC) \
-       $(VARIOUS)/usb_serial.c \
-       $(VARIOUS)/adcHelper.c \
        $(VARIOUS)/microrl/microrl.c \
        $(VARIOUS)/microrl/microrlShell.c \
        $(VARIOUS)/stdutil.c \
@@ -223,8 +221,8 @@ $(CONFDIR)/board.h: $(CONFDIR)/board.cfg
 	$(shell mkdir -p $(dir $@))
 	$(TOOLDIR)/boardGen.pl -opd=STM32_open_pin_data --no-pp-line $<  $@
 
-flash: build/ch.elf
-	$(TOOLDIR)/bmpflash build/ch.elf
+flash: build/PompeSAP.elf
+	$(TOOLDIR)/bmpflash build/PompeSAP.elf
 
 dfu_flash: build/ch.bin
 	dfu-util -d 0483:df11 -c 1 -i 0 -a 0 -s 0x08000000:leave -D build/ch.bin

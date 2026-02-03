@@ -271,7 +271,7 @@
 #define CONSOLE_DEV_USB 0
 
 #if CONSOLE_DEV_USB == 0
-#define CONSOLE_DEV_SD SD2
+#define CONSOLE_DEV_SD SD1
 #endif
 
 #define CH_HEAP_SIZE (32*1024)

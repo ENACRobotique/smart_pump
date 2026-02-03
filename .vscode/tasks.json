@@ -32,11 +32,23 @@
             "label" : "Clean",
             "command":"make", 
             "args": [
-                "-D","/dev/ttyACMbmp"
+                "clean"
             ],
             "options": {
                 "statusbar": {
-                    "label": "Serial monitor $(plug)"
+                    "label": "$(trash) Clean"
+                }
+            }
+        },
+        {   
+            "label" : "Serial Monitor",
+            "command":"minicom", 
+            "args": [
+                "-D","/dev/bmp_serial"
+            ],
+            "options": {
+                "statusbar": {
+                    "label": "$(plug) Serial monitor "
                 }
             }
         },
