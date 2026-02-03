@@ -2,6 +2,7 @@
 #include <hal.h>
 #include <stdutil++.hpp>
 #include "ttyConsole.h"
+#include "current.h"
 
 
 #define ADC_GRP1_NUM_CHANNELS 1
