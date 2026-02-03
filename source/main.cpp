@@ -147,6 +147,7 @@ int main(void) {
 
   halInit();
   chSysInit();
+  initHeap();
 
   consoleInit();
   consoleLaunch();

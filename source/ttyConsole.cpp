@@ -39,25 +39,16 @@ static const ShellCommand commands[] = {
 
 
 static void cmd_help(BaseSequentialStream *lchp, int argc,const char * const argv[]) {
+  (void)argv;
   if(argc == 0) {
     chprintf (lchp, "Commands available:\r\n");
-    chprintf (lchp, "\tmem:\r\n");
-    chprintf (lchp, "\tthreads: info about threads\n");
-    chprintf (lchp, "\tuid: get chip unique ID\r\n");
-    chprintf (lchp, "\thelp: get help\r\n");
-    chprintf (lchp, "\tmot:\r\n");
-    chprintf (lchp, "\tenc: get encoder value\r\n");
-  } else if(memcmp(argv[0], "mot", strlen(argv[0])) == 0) {
-    chprintf (lchp, "Usage: mot <mot_no> <speed>\r\n");
-    chprintf (lchp, "mot_no in [1 .. 3], speed in [-100.0 .. 100.0]\r\n");
-  } else if(memcmp(argv[0], "enc", strlen(argv[0])) == 0) {
-    chprintf (lchp, "Usage: enc <enc_no>\r\n");
-    chprintf (lchp, "enc_no in [1 .. 3]\r\n");
-  } else {
-    chprintf (lchp, "No help for \"%s\"\r\n", argv[0]);
+    for(int i=0; commands[i].sc_function != NULL; i++) {
+      chprintf(lchp, "\t");
+      chprintf(lchp, commands[i].sc_name);
+      chprintf(lchp, "\r\n");
+    }
   }
 }
-
 
 /*===========================================================================*/
 /* START OF PRIVATE SECTION  : DO NOT CHANGE ANYTHING BELOW THIS LINE        */
