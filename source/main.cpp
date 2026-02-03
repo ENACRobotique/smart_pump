@@ -5,19 +5,21 @@
 
 
 #define ADC_GRP1_NUM_CHANNELS 1
-#define ADC_GRP1_BUF_DEPTH   8
+#define ADC_GRP1_BUF_DEPTH   1
 
-static adcsample_t adc_buffer[ADC_GRP1_BUF_DEPTH*ADC_GRP1_NUM_CHANNELS];
+adcsample_t adc_buffer[ADC_GRP1_BUF_DEPTH*ADC_GRP1_NUM_CHANNELS];
 
 const ADCConfig portab_adccfg1 = {
   .difsel       = 0U
 }; 
 
+void adc_error_cb(ADCDriver *adcp, adcerror_t err);
+
 const ADCConversionGroup portab_adcgrpcfg1 = {
   .circular     = false,
   .num_channels = ADC_GRP1_NUM_CHANNELS,
   .end_cb       = NULL,
-  .error_cb     = NULL, //adcerrorcallback,
+  .error_cb     = adc_error_cb,
   .cfgr         = 0U,
   .cfgr2        = 0U,
   .tr1          = ADC_TR_DISABLED,
@@ -26,18 +28,23 @@ const ADCConversionGroup portab_adcgrpcfg1 = {
   .awd2cr       = 0U,
   .awd3cr       = 0U,
   .smpr         = {
-    ADC_SMPR1_SMP_AN0(ADC_SMPR_SMP_247P5) |
-    ADC_SMPR1_SMP_AN5(ADC_SMPR_SMP_247P5),
+    ADC_SMPR1_SMP_AN6(ADC_SMPR_SMP_247P5),
     0U
   },
   .sqr          = {
-    ADC_SQR1_SQ1_N(ADC_CHANNEL_IN0) | ADC_SQR1_SQ2_N(ADC_CHANNEL_IN5),
+    ADC_SQR1_SQ1_N(ADC_CHANNEL_IN6),
     0U,
     0U,
     0U
   }
 };
 
+
+void adc_error_cb(ADCDriver *adcp, adcerror_t err) {
+  (void)adcp;
+  (void)err;
+  chSysHalt("shit");
+}
 
 
 
@@ -48,13 +55,13 @@ static THD_FUNCTION(AdcWatchThread, arg) {
   (void)arg; 
   chRegSetThreadName("ADC_Watch");
 
-  adcStart(&ADCD1,NULL);
+  adcStart(&ADCD1, &portab_adccfg1);
     
   while(true){
     adcConvert(&ADCD1, &portab_adcgrpcfg1, adc_buffer, ADC_GRP1_BUF_DEPTH ); 
 
-    const adcsample_t Sample = adc_buffer[0]; 
-    ValeurVolt = (Sample *3.3)/4096; 
+    const adcsample_t sample = adc_buffer[0]; 
+    ValeurVolt = (sample *3.3)/4096; 
     DebugTrace("%f", ValeurVolt);
 
     chThdSleepMilliseconds(100);
@@ -132,7 +139,6 @@ static THD_FUNCTION(Blinker, arg) {
 
   while (true) {   
     palToggleLine(LINE_LED);
-    DebugTrace( "Test");
     chThdSleepMilliseconds(500);
   }
     
