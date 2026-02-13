@@ -1,5 +1,10 @@
-#pragma once
+//#pragma once
 
-void startCurrentSensing();
+#ifndef CURRENT_H
+#define CURRENT_H
 
-float getCurrent();
+void currentInit(void);
+float getCurrent(void);
+
+#endif
+

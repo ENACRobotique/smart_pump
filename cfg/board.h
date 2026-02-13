@@ -60,7 +60,7 @@
  */
 #define	PA00                           0U
 #define	PA01_CURRENT                   1U
-#define	PA02                           2U
+#define	PA02_UART_TX                   2U
 #define	PA03                           3U
 #define	PA04                           4U
 #define	PA05                           5U
@@ -164,6 +164,7 @@
  * IO lines assignments.
  */
 #define	LINE_CURRENT                   PAL_LINE(GPIOA, 1U)
+#define	LINE_UART_TX                   PAL_LINE(GPIOA, 2U)
 #define	LINE_VALVE                     PAL_LINE(GPIOA, 7U)
 #define	LINE_SWDIO                     PAL_LINE(GPIOA, 13U)
 #define	LINE_SWCLK                     PAL_LINE(GPIOA, 14U)
@@ -203,7 +204,7 @@
 
 #define VAL_GPIOA_MODER                 (PIN_MODE_ANALOG(PA00) | \
 					 PIN_MODE_ANALOG(PA01_CURRENT) | \
-					 PIN_MODE_ANALOG(PA02) | \
+					 PIN_MODE_ALTERNATE(PA02_UART_TX) | \
 					 PIN_MODE_ANALOG(PA03) | \
 					 PIN_MODE_ANALOG(PA04) | \
 					 PIN_MODE_ANALOG(PA05) | \
@@ -220,7 +221,7 @@
 
 #define VAL_GPIOA_OTYPER                (PIN_OTYPE_PUSHPULL(PA00) | \
 					 PIN_OTYPE_PUSHPULL(PA01_CURRENT) | \
-					 PIN_OTYPE_PUSHPULL(PA02) | \
+					 PIN_OTYPE_PUSHPULL(PA02_UART_TX) | \
 					 PIN_OTYPE_PUSHPULL(PA03) | \
 					 PIN_OTYPE_PUSHPULL(PA04) | \
 					 PIN_OTYPE_PUSHPULL(PA05) | \
@@ -237,7 +238,7 @@
 
 #define VAL_GPIOA_OSPEEDR               (PIN_OSPEED_SPEED_VERYLOW(PA00) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA01_CURRENT) | \
-					 PIN_OSPEED_SPEED_VERYLOW(PA02) | \
+					 PIN_OSPEED_SPEED_HIGH(PA02_UART_TX) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA03) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA04) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA05) | \
@@ -254,7 +255,7 @@
 
 #define VAL_GPIOA_PUPDR                 (PIN_PUPDR_FLOATING(PA00) | \
 					 PIN_PUPDR_FLOATING(PA01_CURRENT) | \
-					 PIN_PUPDR_FLOATING(PA02) | \
+					 PIN_PUPDR_FLOATING(PA02_UART_TX) | \
 					 PIN_PUPDR_FLOATING(PA03) | \
 					 PIN_PUPDR_FLOATING(PA04) | \
 					 PIN_PUPDR_FLOATING(PA05) | \
@@ -271,7 +272,7 @@
 
 #define VAL_GPIOA_ODR                   (PIN_ODR_LEVEL_HIGH(PA00) | \
 					 PIN_ODR_LEVEL_LOW(PA01_CURRENT) | \
-					 PIN_ODR_LEVEL_HIGH(PA02) | \
+					 PIN_ODR_LEVEL_HIGH(PA02_UART_TX) | \
 					 PIN_ODR_LEVEL_HIGH(PA03) | \
 					 PIN_ODR_LEVEL_HIGH(PA04) | \
 					 PIN_ODR_LEVEL_HIGH(PA05) | \
@@ -288,7 +289,7 @@
 
 #define VAL_GPIOA_AFRL			(PIN_AFIO_AF(PA00, 0) | \
 					 PIN_AFIO_AF(PA01_CURRENT, 0) | \
-					 PIN_AFIO_AF(PA02, 0) | \
+					 PIN_AFIO_AF(PA02_UART_TX, 7) | \
 					 PIN_AFIO_AF(PA03, 0) | \
 					 PIN_AFIO_AF(PA04, 0) | \
 					 PIN_AFIO_AF(PA05, 0) | \
@@ -306,7 +307,7 @@
 
 #define VAL_GPIOA_ASCR                  (PIN_ASCR_DISABLED(PA00) | \
 					 PIN_ASCR_ENABLED(PA01_CURRENT) | \
-					 PIN_ASCR_DISABLED(PA02) | \
+					 PIN_ASCR_DISABLED(PA02_UART_TX) | \
 					 PIN_ASCR_DISABLED(PA03) | \
 					 PIN_ASCR_DISABLED(PA04) | \
 					 PIN_ASCR_DISABLED(PA05) | \
@@ -323,7 +324,7 @@
 
 #define VAL_GPIOA_LOCKR                 (PIN_LOCKR_DISABLED(PA00) | \
 					 PIN_LOCKR_DISABLED(PA01_CURRENT) | \
-					 PIN_LOCKR_DISABLED(PA02) | \
+					 PIN_LOCKR_DISABLED(PA02_UART_TX) | \
 					 PIN_LOCKR_DISABLED(PA03) | \
 					 PIN_LOCKR_DISABLED(PA04) | \
 					 PIN_LOCKR_DISABLED(PA05) | \
@@ -1023,6 +1024,8 @@
 					 PIN_LOCKR_DISABLED(PE14) | \
 					 PIN_LOCKR_DISABLED(PE15))
 
+#define AF_PA02_UART_TX                  7U
+#define AF_LINE_UART_TX                  7U
 #define AF_PA13_SWDIO                    0U
 #define AF_LINE_SWDIO                    0U
 #define AF_PA14_SWCLK                    0U
