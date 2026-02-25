@@ -5,7 +5,9 @@
 #include "current.h"
 #include "uart.h"
 #include "pompe_valve.h"
+#include "settings.h"
 
+uint16_t wait_led = 1000; 
 
 static THD_WORKING_AREA(waBlinker, 1024);
 static THD_FUNCTION(Blinker, arg) {
@@ -14,7 +16,7 @@ static THD_FUNCTION(Blinker, arg) {
 
   while (true) {   
     palToggleLine(LINE_LED);
-    chThdSleepMilliseconds(500);
+    chThdSleepMilliseconds(wait_led);
   }  
 }
 
@@ -23,9 +25,8 @@ int main(void) {
   halInit();
   chSysInit();
 
-  
-  consoleInit();
-  consoleLaunch();
+  // consoleInit();
+  // consoleLaunch();
   pump_off();
   valve_fermer();
 
