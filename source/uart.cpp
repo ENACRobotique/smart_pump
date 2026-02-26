@@ -23,7 +23,7 @@ typedef struct
     uint32_t baudrate;
 } baudrate_map_t;
 
-baudrate_map_t baudrate_map[9] = {
+static baudrate_map_t baudrate_map[9] = {
     {1, 1000000},
     {3, 500000},
     {4, 400000},
@@ -35,7 +35,7 @@ baudrate_map_t baudrate_map[9] = {
     {207, 9600},
 };
 
-uint32_t get_baudrate(uint8_t value)
+static uint32_t get_baudrate(uint8_t value)
 {
     for (int i = 0; i < 9; i++)
     {
@@ -50,13 +50,17 @@ uint32_t get_baudrate(uint8_t value)
 void wait_return_delay(void)
 {
     if (settings.return_delay > 0)
-    {
+{
         chThdSleepMicroseconds(settings.return_delay * 2);
     }
 }
 
-void send_status_packet(uint8_t error, uint8_t *params, uint8_t param_lenght)
+static void send_status_packet(uint8_t error, uint8_t *params, uint8_t param_lenght, bool repond)
 {
+
+    if(repond == false){
+        return; 
+    }
     uint8_t buffer[32];
 
     buffer[0] = 0xFF;
@@ -78,16 +82,17 @@ void send_status_packet(uint8_t error, uint8_t *params, uint8_t param_lenght)
     sdWrite(&SD2, buffer, param_lenght + 6);
 }
 
-void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
+static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool repond)
 {
     uint8_t tx_params[4];
     uint8_t error = 0;
+    
+
 
     switch (instruction)
     {
-    case PING:
-        wait_return_delay(); 
-        send_status_packet(0, NULL, 0);
+    case PING: 
+        send_status_packet(0, NULL, 0, repond);
         break;
 
     case WRITE:
@@ -132,8 +137,10 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
             }
             else if (reg == REG_VALVE_USE)
             {
+                send_status_packet(error, NULL, 0 , repond) ;
                 valve_utilisation();
                 DebugTrace("Valve utiliser\r\n");
+                return;
             }
             else if (reg == REG_ID)
             {
@@ -166,13 +173,18 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
                     error = error | 1 << 3;
                 }
             }
+            else if (reg == REG_RETURN_TIME)
+            {
+                    settings.return_delay = params[1]; 
+                    store_settings(1, &settings);
+            }
             // else if(reg == REG_CURRENT_TRESHOLD_LSB){
             //     if(params[1]!= 0){
             //         settings.current_threshold
             //     }
             // }
         }
-        send_status_packet(error, NULL, 0);
+        send_status_packet(error, NULL, 0 , repond) ;
 
         break;
 
@@ -189,7 +201,7 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
                 tx_params[0] = current & 0xFF;
                 tx_params[1] = (current>>8) & 0xFF  ;
 
-                send_status_packet(0, tx_params, 2);
+                send_status_packet(0, tx_params, 2 , repond);
             }
         }
         break;
@@ -273,7 +285,8 @@ static THD_FUNCTION(UartCmdThread, arg)
 
                 if (calcul_checksum == checksum)
                 {
-                    action(instruction, params, lenght - 2);
+                    bool repond = (id != 0xFE) || (instruction == PING);  
+                    action(instruction, params, lenght - 2, repond);
                 }
             }
 
@@ -297,7 +310,7 @@ void uartCmdInit(void)
             .return_delay = 254,
             .pump_duty = 100,
             .valve_duty = 100,
-            .current_threshold = 10,
+            .current_threshold = 300,
             .valve_release_time = 500,
         };
     }

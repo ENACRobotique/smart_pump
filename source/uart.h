@@ -25,11 +25,7 @@
 #define REG_GRAB_OK 0x25
 
 
-
-
 void uartCmdInit(void);
-void action(uint8_t instruction, uint8_t *params, uint8_t param_len); 
-void send_status_packet( uint8_t error, uint8_t *params, uint8_t param_lenght); 
-void wait_return_delay(void); 
+
 
 #endif
