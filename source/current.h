@@ -1,10 +1,7 @@
-//#pragma once
-
-#ifndef CURRENT_H
-#define CURRENT_H
+#pragma once
 
 void currentInit(void);
-float getCurrent(void);
+uint16_t getCurrent(void);
 
-#endif
+
 

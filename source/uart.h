@@ -12,9 +12,9 @@
 #define REG_CURRENT_TRESHOLD_LSB 0x03  // two bytes long
 #define REG_CURRENT_TRESHOLD_MSB 0x04
 #define REG_RETURN_TIME 0x05
-#define REG_BAUDRATE    0x06
-#define REG_PUMP_DUTY    0X07
-#define REG_VALVE_DUTY  0X08
+#define REG_BAUDRATE  0x06
+#define REG_PUMP_DUTY 0X07
+#define REG_VALVE_DUTY 0X08
 #define REG_VALVE_RELEASE_TIME 0X09
 
 #define REG_POMPE 0x20 // registre de reception des commande 

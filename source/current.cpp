@@ -2,6 +2,9 @@
 #include "hal.h"
 #include "current.h"
 
+#include <stdutil++.hpp>
+#include "ttyConsole.h"
+
 
 
 #define ADC_GRP1_NUM_CHANNELS 1
@@ -44,7 +47,7 @@ static const ADCConversionGroup portab_adcgrpcfg1 = {
 };
 
 
-static float currentVoltage = 0.0f;
+static uint16_t currentVoltage = 0;
 static mutex_t currentMutex;
 
 static THD_WORKING_AREA(waCurrentAdc, 1024);
@@ -55,17 +58,16 @@ static THD_FUNCTION(CurrentAdcThread, arg) {
   adcStart(&ADCD1, &portab_adccfg1);
 
   while (true) {
+    float alpha = 0.85; 
     adcConvert(&ADCD1,
                &portab_adcgrpcfg1,
                adc_buffer,
                ADC_GRP1_BUF_DEPTH);
 
-    float voltage = (adc_buffer[0] * 3.3f) / 4096.0f;
-
     chMtxLock(&currentMutex);
-    currentVoltage = voltage;
+    currentVoltage = alpha * currentVoltage + (1- alpha) * adc_buffer[0];
     chMtxUnlock(&currentMutex);
-
+    DebugTrace(">current:%u", currentVoltage); 
     chThdSleepMilliseconds(100);
   }
 }
@@ -79,8 +81,8 @@ void currentInit(void) {
                     NULL);
 }
 
-float getCurrent(void) {
-  float val;
+uint16_t getCurrent(void) {
+  uint16_t val;
 
   chMtxLock(&currentMutex);
   val = currentVoltage;

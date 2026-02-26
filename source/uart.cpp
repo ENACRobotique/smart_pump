@@ -86,6 +86,7 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
     switch (instruction)
     {
     case PING:
+        wait_return_delay(); 
         send_status_packet(0, NULL, 0);
         break;
 
@@ -165,6 +166,11 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
                     error = error | 1 << 3;
                 }
             }
+            // else if(reg == REG_CURRENT_TRESHOLD_LSB){
+            //     if(params[1]!= 0){
+            //         settings.current_threshold
+            //     }
+            // }
         }
         send_status_packet(error, NULL, 0);
 
@@ -177,17 +183,13 @@ void action(uint8_t instruction, uint8_t *params, uint8_t param_len)
 
             if (params[0] == REG_CURRENT_LSB || params[1] == 2)
             {
-                float current = getCurrent();
+                uint16_t current = getCurrent();
                 DebugTrace("Courant de l'ADC est de %f \r\n", current);
 
-                uint8_t *float_bit = (uint8_t *)&current;
+                tx_params[0] = current & 0xFF;
+                tx_params[1] = (current>>8) & 0xFF  ;
 
-                tx_params[0] = float_bit[0];
-                tx_params[1] = float_bit[1];
-                tx_params[2] = float_bit[2];
-                tx_params[3] = float_bit[3];
-
-                send_status_packet(0, tx_params, 4);
+                send_status_packet(0, tx_params, 2);
             }
         }
         break;
@@ -283,6 +285,7 @@ static THD_FUNCTION(UartCmdThread, arg)
 
 void uartCmdInit(void)
 {
+    
     settingsInit();
     mfs_error_t status = read_settings(1, &settings);
     if (status != MFS_NO_ERROR)

@@ -25,8 +25,9 @@ int main(void) {
   halInit();
   chSysInit();
 
-  // consoleInit();
-  // consoleLaunch();
+  //consoleInit();
+  //consoleLaunch();
+
   pump_off();
   valve_fermer();
 
