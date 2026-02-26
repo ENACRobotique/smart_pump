@@ -12,7 +12,7 @@ rom_settings_t settings;
 extern uint16_t wait_led;
 
 static SerialConfig uartCfg = {
-    .speed = 115200,
+    .speed = 500000,
     .cr1 = 0,
     .cr2 = USART_CR2_STOP1_BITS,
     .cr3 = USART_CR3_HDSEL};
@@ -306,7 +306,7 @@ void uartCmdInit(void)
         wait_led = 100;
         settings = {
             .id = 0x01,
-            .baudrate = 16,
+            .baudrate = 3,
             .return_delay = 254,
             .pump_duty = 100,
             .valve_duty = 100,
@@ -319,7 +319,7 @@ void uartCmdInit(void)
     uint32_t baudrate_speed = get_baudrate(settings.baudrate);
     if (baudrate_speed == 0)
     {
-        baudrate_speed = 115200;
+        baudrate_speed = 500000;
     }
     uartCfg.speed = baudrate_speed;
     sdStart(&SD2, &uartCfg);
