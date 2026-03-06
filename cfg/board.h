@@ -209,7 +209,7 @@
 					 PIN_MODE_ANALOG(PA04) | \
 					 PIN_MODE_ANALOG(PA05) | \
 					 PIN_MODE_ANALOG(PA06) | \
-					 PIN_MODE_OUTPUT(PA07_VALVE) | \
+					 PIN_MODE_ALTERNATE(PA07_VALVE) | \
 					 PIN_MODE_ANALOG(PA08) | \
 					 PIN_MODE_ANALOG(PA09) | \
 					 PIN_MODE_ANALOG(PA10) | \
@@ -243,7 +243,7 @@
 					 PIN_OSPEED_SPEED_VERYLOW(PA04) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA05) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA06) | \
-					 PIN_OSPEED_SPEED_VERYLOW(PA07_VALVE) | \
+					 PIN_OSPEED_SPEED_HIGH(PA07_VALVE) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA08) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA09) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PA10) | \
@@ -294,7 +294,7 @@
 					 PIN_AFIO_AF(PA04, 0) | \
 					 PIN_AFIO_AF(PA05, 0) | \
 					 PIN_AFIO_AF(PA06, 0) | \
-					 PIN_AFIO_AF(PA07_VALVE, 0))
+					 PIN_AFIO_AF(PA07_VALVE, 1))
 
 #define VAL_GPIOA_AFRH			(PIN_AFIO_AF(PA08, 0) | \
 					 PIN_AFIO_AF(PA09, 0) | \
@@ -339,7 +339,7 @@
 					 PIN_LOCKR_DISABLED(PA14_SWCLK) | \
 					 PIN_LOCKR_DISABLED(PA15))
 
-#define VAL_GPIOB_MODER                 (PIN_MODE_OUTPUT(PB00_PUMP) | \
+#define VAL_GPIOB_MODER                 (PIN_MODE_ALTERNATE(PB00_PUMP) | \
 					 PIN_MODE_ANALOG(PB01) | \
 					 PIN_MODE_ANALOG(PB02) | \
 					 PIN_MODE_OUTPUT(PB03_LED) | \
@@ -373,7 +373,7 @@
 					 PIN_OTYPE_PUSHPULL(PB14) | \
 					 PIN_OTYPE_PUSHPULL(PB15))
 
-#define VAL_GPIOB_OSPEEDR               (PIN_OSPEED_SPEED_VERYLOW(PB00_PUMP) | \
+#define VAL_GPIOB_OSPEEDR               (PIN_OSPEED_SPEED_HIGH(PB00_PUMP) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PB01) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PB02) | \
 					 PIN_OSPEED_SPEED_VERYLOW(PB03_LED) | \
@@ -424,7 +424,7 @@
 					 PIN_ODR_LEVEL_HIGH(PB14) | \
 					 PIN_ODR_LEVEL_HIGH(PB15))
 
-#define VAL_GPIOB_AFRL			(PIN_AFIO_AF(PB00_PUMP, 0) | \
+#define VAL_GPIOB_AFRL			(PIN_AFIO_AF(PB00_PUMP, 1) | \
 					 PIN_AFIO_AF(PB01, 0) | \
 					 PIN_AFIO_AF(PB02, 0) | \
 					 PIN_AFIO_AF(PB03_LED, 0) | \
@@ -1026,10 +1026,14 @@
 
 #define AF_PA02_UART_TX                  7U
 #define AF_LINE_UART_TX                  7U
+#define AF_PA07_VALVE                    1U
+#define AF_LINE_VALVE                    1U
 #define AF_PA13_SWDIO                    0U
 #define AF_LINE_SWDIO                    0U
 #define AF_PA14_SWCLK                    0U
 #define AF_LINE_SWCLK                    0U
+#define AF_PB00_PUMP                     1U
+#define AF_LINE_PUMP                     1U
 #define AF_PB06_TERMINAL_TX              7U
 #define AF_LINE_TERMINAL_TX              7U
 #define AF_PB07_TERMINAL_RX              7U

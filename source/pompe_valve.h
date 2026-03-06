@@ -2,6 +2,7 @@
 #define POMPE_VALVE_H
 
 
+void pumpInit();
 
 void pump_on(); 
 void pump_off(); 

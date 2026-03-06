@@ -25,15 +25,14 @@ int main(void) {
   halInit();
   chSysInit();
 
-  //consoleInit();
-  //consoleLaunch();
+  // consoleInit();
+  // consoleLaunch();
 
+  currentInit();     
+  uartCmdInit();  
+  pumpInit();
   pump_off();
   valve_fermer();
-
-  
-  currentInit();     
-  uartCmdInit();    
 
   chThdCreateStatic(waBlinker,sizeof(waBlinker), LOWPRIO, Blinker, NULL);
 
