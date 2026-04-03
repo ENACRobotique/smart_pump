@@ -13,14 +13,17 @@ constexpr uint16_t MODEL_NUMBER = 20;
 rom_settings_t settings;
 extern uint16_t wait_led;
 
+static uint8_t buffer[32];
+static uint8_t param_lenght = 0;
+
 static SerialConfig uartCfg = {
     .speed = 500000,
     .cr1 = 0,
     .cr2 = USART_CR2_STOP1_BITS,
-    .cr3 = USART_CR3_HDSEL};
+    .cr3 = USART_CR3_HDSEL
+};
 
-typedef struct
-{
+typedef struct {
     uint8_t value;
     uint32_t baudrate;
 } baudrate_map_t;
@@ -39,31 +42,35 @@ static baudrate_map_t baudrate_map[9] = {
 
 static uint32_t get_baudrate(uint8_t value)
 {
-    for (int i = 0; i < 9; i++)
-    {
-        if (value == baudrate_map[i].value)
-        {
+    for (int i = 0; i < 9; i++) {
+        if (value == baudrate_map[i].value) {
             return baudrate_map[i].baudrate;
         }
     }
     return 0;
 }
 
-void wait_return_delay(void)
-{
-    if (settings.return_delay > 0)
-{
-        chThdSleepMicroseconds(settings.return_delay * 2);
-    }
+
+static void uart_timer_callback(GPTDriver *gptp) {
+    (void)gptp;
+
+    chSysLockFromISR();
+    sdWriteI(&SD2, buffer, param_lenght + 6);
+    chSysUnlockFromISR();
 }
 
-static void send_status_packet(uint8_t error, uint8_t *params, uint8_t param_lenght, bool repond)
-{
+static const GPTConfig gpt16cgf = {
+    500000U,
+    uart_timer_callback,
+    0,
+    0};
 
-    if(repond == false){
-        return; 
+static void send_status_packet(uint8_t error, uint8_t *params, bool repond) {
+
+    if (repond == false)
+    {
+        return;
     }
-    uint8_t buffer[32];
 
     buffer[0] = 0xFF;
     buffer[1] = 0xFF;
@@ -72,51 +79,44 @@ static void send_status_packet(uint8_t error, uint8_t *params, uint8_t param_len
     buffer[4] = error;
 
     uint8_t checksum_calcul = buffer[2] + buffer[3] + buffer[4];
-    for (int i = 0; i < param_lenght; i++)
-    {
+    for (int i = 0; i < param_lenght; i++) {
         buffer[5 + i] = params[i];
         checksum_calcul += params[i];
     }
     buffer[5 + param_lenght] = ~checksum_calcul;
 
-    wait_return_delay();
-
-    sdWrite(&SD2, buffer, param_lenght + 6);
+    gptStartOneShot(&GPTD16, settings.return_delay);
 }
 
-static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool repond)
-{
+static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool repond) {
     uint8_t tx_params[4];
     uint8_t error = 0;
-    
-
 
     switch (instruction)
     {
-    case PING: 
-        send_status_packet(0, NULL, 0, repond);
+    case PING:
+        param_lenght = 0;
+        send_status_packet(0, NULL, repond);
         break;
 
     case WRITE:
         if (param_len >= 2)
         {
             uint8_t reg = params[0]; // Adresse du registre
-            if (reg == REG_ID)
-            {
+            if (reg == REG_ID) {
                 if (params[1] == 0 || params[1] == 255 || params[1] == 254)
                 {
                     error = error | 1 << 3;
                 }
                 else
                 {
-                    settings.id= params[1]; 
+                    settings.id = params[1];
                     store_settings(1, &settings);
                     DebugTrace("param[1] = %d , setting.id = %d \r\n", params[1], settings.id);
-        
                 }
             }
             else if (reg == REG_RETURN_TIME) {
-                settings.return_delay = params[1];;
+                settings.return_delay = params[1];
                 store_settings(1, &settings);
             }
             else if (reg == REG_BAUDRATE) {
@@ -148,33 +148,39 @@ static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool
                 store_settings(1, &settings);
             }
             else if (reg == REG_POMPE) {
-                if (params[1] != 0) {
+                if (params[1] != 0)
+                {
                     pump_on();
                     DebugTrace("Pump ON\r\n");
                 }
-                else {
+                else
+                {
                     pump_off();
                     DebugTrace("Pump OFF\r\n");
                 }
             }
             else if (reg == REG_VALVE) {
-                if (params[1] != 0) {
+                if (params[1] != 0)
+                {
                     valve_ouvert();
                     DebugTrace("Valve OPEN\r\n");
                 }
-                else {
+                else
+                {
                     valve_fermer();
                     DebugTrace("Valve CLOSE\r\n");
                 }
             }
             else if (reg == REG_VALVE_USE) {
-                send_status_packet(error, NULL, 0 , repond) ;
+                param_lenght = 0;
+                send_status_packet(error, NULL, repond);
                 valve_utilisation();
                 DebugTrace("Valve utiliser\r\n");
                 return;
             }
         }
-        send_status_packet(error, NULL, 0 , repond);
+        param_lenght = 0;
+        send_status_packet(error, NULL, repond);
 
         break;
 
@@ -184,44 +190,66 @@ static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool
         {
             uint8_t reg = params[0];
             uint8_t nb_params = params[1];
-            if (reg == REG_MODEL_NUMBER_LSB && nb_params == 2) {
-                uint16_t* p_model_number = (uint16_t*)tx_params;
+            if (reg == REG_MODEL_NUMBER_LSB && nb_params == 2)
+            {
+                uint16_t *p_model_number = (uint16_t *)tx_params;
                 *p_model_number = MODEL_NUMBER;
-                send_status_packet(0, tx_params, 2 , repond);
+                param_lenght = 2;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_ID && nb_params == 1) {
+            else if (reg == REG_ID && nb_params == 1) {
                 tx_params[0] = settings.id;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_RETURN_TIME && nb_params == 1) {
+            else if (reg == REG_RETURN_TIME && nb_params == 1) {
                 tx_params[0] = settings.return_delay;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_BAUDRATE && nb_params == 1) {
+            else if (reg == REG_BAUDRATE && nb_params == 1) {
                 tx_params[0] = settings.baudrate;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_PUMP_DUTY && nb_params == 1) {
+            else if (reg == REG_PUMP_DUTY && nb_params == 1) {
                 tx_params[0] = settings.pump_duty;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_VALVE_DUTY && nb_params == 1) {
+            else if (reg == REG_VALVE_DUTY && nb_params == 1) {
                 tx_params[0] = settings.valve_duty;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
-            else if(reg == REG_VALVE_RELEASE_TIME && nb_params == 1) {
+            else if (reg == REG_VALVE_RELEASE_TIME && nb_params == 1) {
                 tx_params[0] = settings.valve_release_time;
-                send_status_packet(0, tx_params, 1 , repond);
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
+            }
+            else if (reg == REG_POMPE && nb_params == 1) {
+                tx_params[0] = getPumpState(); 
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
+            }
+            else if (reg == REG_VALVE && nb_params == 1) {
+                tx_params[0] = getValveState(); 
+                param_lenght = 1;
+                send_status_packet(0, tx_params, repond);
             }
             else if (reg == REG_CURRENT_LSB && nb_params == 2) {
-                uint16_t* p_current =(uint16_t*)&tx_params[0];
+                uint16_t *p_current = (uint16_t *)&tx_params[0];
                 *p_current = getCurrent();
                 DebugTrace("Courant de l'ADC est de %d \r\n", *p_current);
-                send_status_packet(0, tx_params, 2 , repond);
+                param_lenght = 2;
+                send_status_packet(0, tx_params, repond);
             }
             else {
-                send_status_packet(error, NULL, 0 , repond);
+                param_lenght = 0;
+                send_status_packet(error, NULL, repond);
             }
+        } else {
+
         }
         break;
     }
@@ -254,9 +282,13 @@ static THD_FUNCTION(UartCmdThread, arg)
             break;
         case 1:
             if (rx_bit == 0xFF)
+            {
                 state = 2;
+            }
             else
+            {
                 state = 0;
+            }
             break;
         case 2:
             if (rx_bit == 0xFF)
@@ -304,7 +336,7 @@ static THD_FUNCTION(UartCmdThread, arg)
 
                 if (calcul_checksum == checksum)
                 {
-                    bool repond = (id != 0xFE) || (instruction == PING);  
+                    bool repond = (id != 0xFE) || (instruction == PING);
                     action(instruction, params, lenght - 2, repond);
                 }
             }
@@ -317,7 +349,7 @@ static THD_FUNCTION(UartCmdThread, arg)
 
 void uartCmdInit(void)
 {
-    
+    gptStart(&GPTD16, &gpt16cgf);
     settingsInit();
     mfs_error_t status = read_settings(1, &settings);
     if (status != MFS_NO_ERROR)
@@ -330,11 +362,11 @@ void uartCmdInit(void)
             .pump_duty = 100,
             .valve_duty = 100,
             .current_threshold = 300,
-            .valve_release_time = 500,
+            .valve_release_time = 5,
         };
     }
     DebugTrace("id = %d, \r\n baudrate = %d,\r\n return_delay = %d,\r\n pump_duty =%d, \r\n valve_duty = %d,\r\n current_threshold = %d,\r\n valve_release_time = %d \r\n",
-        settings.id, settings.baudrate, settings.return_delay, settings.pump_duty, settings.valve_duty, settings.current_threshold, settings.valve_release_time); 
+               settings.id, settings.baudrate, settings.return_delay, settings.pump_duty, settings.valve_duty, settings.current_threshold, settings.valve_release_time);
     uint32_t baudrate_speed = get_baudrate(settings.baudrate);
     if (baudrate_speed == 0)
     {

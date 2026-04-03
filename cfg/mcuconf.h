@@ -152,8 +152,8 @@
 #define STM32_GPT_USE_TIM2                  FALSE
 #define STM32_GPT_USE_TIM6                  FALSE
 #define STM32_GPT_USE_TIM7                  FALSE
-#define STM32_GPT_USE_TIM15                 FALSE
-#define STM32_GPT_USE_TIM16                 FALSE
+#define STM32_GPT_USE_TIM15                 TRUE
+#define STM32_GPT_USE_TIM16                 TRUE
 
 /*
  * I2C driver system settings.

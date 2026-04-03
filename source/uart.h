@@ -15,7 +15,7 @@
 #define REG_BAUDRATE  0x06
 #define REG_PUMP_DUTY 0X07
 #define REG_VALVE_DUTY 0X08
-#define REG_VALVE_RELEASE_TIME 0X09
+#define REG_VALVE_RELEASE_TIME 0X09     // in 100ms steps
 
 #define REG_POMPE 0x20 // registre de reception des commande 
 #define REG_VALVE 0x21

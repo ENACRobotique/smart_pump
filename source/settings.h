@@ -10,12 +10,12 @@
 typedef struct __attribute__((aligned(8)))
 {
     uint8_t id;                     // ID of this node
-    uint8_t baudrate;               // baudrate  est qu'il suffit ?? pas mettre uint32 ? 
-    uint8_t return_delay;           // return delay for response packet
-    uint8_t pump_duty;              // duty cycle for the pump ON state
-    uint8_t valve_duty;             // duty cycle for the valve OPEN state
+    uint8_t baudrate;               // baudrate. See AX12A baudrates
+    uint8_t return_delay;           // return delay for response packet     2us steps
+    uint8_t pump_duty;              // duty cycle for the pump ON state     [0-100]
+    uint8_t valve_duty;             // duty cycle for the valve OPEN state  [0-100]
     uint16_t current_threshold;     // current threshold for grab detection
-    uint16_t valve_release_time;    // OPEN state duration for the valve release
+    uint16_t valve_release_time;    // OPEN state duration for the valve release in 100ms steps
 } rom_settings_t ;
 
 
