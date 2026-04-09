@@ -19,6 +19,8 @@ const PWMConfig pwm_conf = {
   .dier = 0
 };
 
+static void valve_timer_callback(GPTDriver*); 
+
 static const GPTConfig gpt15cgf = {
   10000u,
   valve_timer_callback,
