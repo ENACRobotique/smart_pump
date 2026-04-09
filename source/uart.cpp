@@ -8,6 +8,9 @@
 #include "ttyConsole.h"
 #include "settings.h"
 
+#define TIMEOUT chTimeMS2I(1)
+
+
 constexpr uint16_t MODEL_NUMBER = 20;
 
 rom_settings_t settings;
@@ -104,8 +107,8 @@ static void action(uint8_t instruction, uint8_t *params, uint8_t param_len, bool
         {
             uint8_t reg = params[0]; // Adresse du registre
             if (reg == REG_ID) {
-                if (params[1] == 0 || params[1] == 255 || params[1] == 254)
-                {
+                if (params[1] == 0 || params[1] == 255 || params[1] == 254)            
+{
                     error = error | 1 << 3;
                 }
                 else
@@ -261,7 +264,6 @@ static THD_FUNCTION(UartCmdThread, arg)
     (void)arg;
     chRegSetThreadName("UART_CMD");
 
-    uint8_t rx_bit;
     uint8_t state = 0;
     uint8_t id = 0;
     uint8_t lenght = 0;
@@ -272,7 +274,12 @@ static THD_FUNCTION(UartCmdThread, arg)
 
     while (true)
     {
-        rx_bit = sdGet(&SD2);
+          
+        msg_t rx_bit = sdGetTimeout(&SD2,TIMEOUT);
+        if (rx_bit < 0){
+            state = 0; 
+            continue; 
+        }
 
         switch (state)
         {
