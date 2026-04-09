@@ -39,8 +39,10 @@ int main(void) {
 
   wdgStart(&WDGD1, &wdgcfg);
 
-  // consoleInit();
-  // consoleLaunch();
+  #if defined TRACE 
+  consoleInit();
+  consoleLaunch();
+  #endif
 
   currentInit();     
   uartCmdInit();  
